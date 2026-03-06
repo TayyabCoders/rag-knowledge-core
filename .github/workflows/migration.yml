@@ -1,0 +1,39 @@
+name: Database Migrations
+
+on:
+  push:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    
+    # Example environment variables required for Alembic
+    env:
+      DB_MASTER_HOST: ${{ secrets.DB_MASTER_HOST }}
+      DB_MASTER_PORT: ${{ secrets.DB_MASTER_PORT }}
+      DB_MASTER_USERNAME: ${{ secrets.DB_MASTER_USERNAME }}
+      DB_MASTER_PASSWORD: ${{ secrets.DB_MASTER_PASSWORD }}
+      DB_MASTER_DATABASE: ${{ secrets.DB_MASTER_DATABASE }}
+      SECRET_KEY: ${{ secrets.API_SECRET_KEY }}
+      DB_AUTO_MIGRATE: "False"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install alembic asyncpg sqlalchemy pydantic-settings structlog
+
+      - name: Run Migrations
+        # If using Docker: docker-compose run --rm api ./scripts/migrate.sh
+        # For bare metal/VM:
+        run: chmod +x scripts/migrate.sh && ./scripts/migrate.sh

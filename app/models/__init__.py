@@ -2,7 +2,8 @@ from typing import Any
 
 from app.models.user_model import User
 from app.models.base_model import Base
-
+from app.models.documents_model import Document
+from app.models.chunks_model import Chunk
 
 async def initialize_models(database: Any) -> None:
     """Initialize database models by creating all tables.
@@ -20,4 +21,4 @@ async def initialize_models(database: Any) -> None:
         await conn.run_sync(Base.metadata.create_all)
 
 
-__all__ = ["User", "initialize_models"]
+__all__ = ["User", "Document", "Chunk", "initialize_models"]
